@@ -1,6 +1,6 @@
 # Update iOS Plist
 
-This action update or add a custom key in the Info.plist file for your iOS projects.
+This action updates or adds custom key/value pairs in the Info.plist file for your iOS projects.
 
 ## Inputs
 
@@ -8,13 +8,9 @@ This action update or add a custom key in the Info.plist file for your iOS proje
 
 **Required** The relative path for the Info.plist file.
 
-### `key-name`
-  
-**Required** The name of the user defined key.
+### `key-value-json`
 
-###  `key-value`
-    
-**Required** The value of the user defined key
+**Required** A JSON string containing an array of key/value pairs.
 
 ###  `print-file`
 
@@ -24,10 +20,9 @@ Output the Info.plist file in console before and after update.
 
 ```yaml
 - name: Update iOS Plist
-  uses: dppeak/update-ios-plist-action@v1.0.0
+  uses: dppeak/update-ios-plist-action@v1.1.0
   with:
     info-plist-path: './path_to_your/Info.plist'
-    key-name: 'UserCustomKey'
-    key-value: 'some value'
+    key-value-json: '[{"FirstCustomKey": "Some new Value"}, {"SecondCustomKey": "Another Value"}]'
     print-file: true
 ```

@@ -20,16 +20,11 @@ async function main(): Promise<void> {
 
     core.debug(`Running action with ${infoPlistPath}`)
 
-    const keyName: string = core.getInput('key-name')
-    const keyValue: string = core.getInput('key-value')
+    const keyValuePairs = JSON.parse(core.getInput('key-value-json'))
+    core.debug(JSON.stringify(keyValuePairs))
 
-    if (!keyName) {
-      core.setFailed(`Key Name has no value: ${keyName}. You must define it.`)
-      process.exit(1)
-    }
-
-    if (!keyValue) {
-      core.setFailed(`Key Value has no value: ${keyValue}. You must define it.`)
+    if (!keyValuePairs) {
+      core.setFailed(`Key Value JSON has no value: ${keyValuePairs}. You must define it.`)
       process.exit(1)
     }
 
@@ -39,10 +34,15 @@ async function main(): Promise<void> {
     }
 
     const fileContent = fs.readFileSync(infoPlistPath, {encoding: 'utf8'})
-    core.debug(JSON.stringify(fileContent))
 
     const obj = plist.parse(fileContent)
-    obj[keyName] = keyValue
+
+    for (const item of keyValuePairs) {
+      for (const [key, value] of Object.entries(item)) {
+        core.debug(`Existing ${key} value ${obj[key]}`)
+        obj[key] = value
+      }
+    }
 
     fs.chmodSync(infoPlistPath, '600')
     fs.writeFileSync(infoPlistPath, plist.build(obj))
@@ -63,7 +63,5 @@ async function handleError(err: unknown): Promise<void> {
 }
 
 function getBooleanInput(inputName: string, defaultValue = false): boolean {
-  return (
-    (core.getInput(inputName) || String(defaultValue)).toUpperCase() === 'TRUE'
-  )
+  return (core.getInput(inputName) || String(defaultValue)).toUpperCase() === 'TRUE'
 }

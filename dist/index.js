@@ -55,14 +55,10 @@ function main() {
                 process.exit(1);
             }
             core.debug(`Running action with ${infoPlistPath}`);
-            const keyName = core.getInput('key-name');
-            const keyValue = core.getInput('key-value');
-            if (!keyName) {
-                core.setFailed(`Key Name has no value: ${keyName}. You must define it.`);
-                process.exit(1);
-            }
-            if (!keyValue) {
-                core.setFailed(`Key Value has no value: ${keyValue}. You must define it.`);
+            const keyValuePairs = JSON.parse(core.getInput('key-value-json'));
+            core.debug(JSON.stringify(keyValuePairs));
+            if (!keyValuePairs) {
+                core.setFailed(`Key Value JSON has no value: ${keyValuePairs}. You must define it.`);
                 process.exit(1);
             }
             if (printFile) {
@@ -70,9 +66,13 @@ function main() {
                 yield exec.exec('cat', [infoPlistPath]);
             }
             const fileContent = fs.readFileSync(infoPlistPath, { encoding: 'utf8' });
-            core.debug(JSON.stringify(fileContent));
             const obj = plist.parse(fileContent);
-            obj[keyName] = keyValue;
+            for (const item of keyValuePairs) {
+                for (const [key, value] of Object.entries(item)) {
+                    core.debug(`Existing ${key} value ${obj[key]}`);
+                    obj[key] = value;
+                }
+            }
             fs.chmodSync(infoPlistPath, '600');
             fs.writeFileSync(infoPlistPath, plist.build(obj));
             if (printFile) {
@@ -93,7 +93,7 @@ function handleError(err) {
     });
 }
 function getBooleanInput(inputName, defaultValue = false) {
-    return ((core.getInput(inputName) || String(defaultValue)).toUpperCase() === 'TRUE');
+    return (core.getInput(inputName) || String(defaultValue)).toUpperCase() === 'TRUE';
 }
 
 

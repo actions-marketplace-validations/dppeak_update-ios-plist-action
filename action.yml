@@ -1,15 +1,12 @@
 name: 'Update iOS Plist'
-description: 'Update iOS User Defined keys in your Info.plist file'
+description: 'Update or add custom key/value pairs in your Info.plist file'
 author: 'dppeak'
 inputs:
   info-plist-path:
     description: 'Relative path for the Info.plist file.'
     required: true
-  key-name:
-    description: 'The name of the user defined key'
-    required: true
-  key-value:
-    description: 'The value of the user defined key'
+  key-value-json:
+    description: 'A JSON string containing an array of key/value pairs'
     required: true
   print-file:
     description: 'Output the Info.plist file in console'
@@ -19,4 +16,4 @@ runs:
   main: 'dist/index.js'
 branding:
   icon: 'file'
-  color: 'blue'
+  color: 'yellow'
